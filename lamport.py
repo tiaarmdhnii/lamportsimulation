@@ -1,12 +1,3 @@
-"""
-Simulasi Lamport Timestamps untuk 3 proses (P1, P2, P3)
-
-Aturan Lamport:
-  1. Local event : C = C + 1
-  2. Send event  : C = C + 1, lalu kirim pesan dengan timestamp C
-  3. Receive     : C = max(C_lokal, ts_pesan) + 1
-"""
-
 from dataclasses import dataclass, field
 
 @dataclass
