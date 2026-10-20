@@ -9,11 +9,10 @@ Aturan Lamport:
 
 from dataclasses import dataclass, field
 
-
 @dataclass
 class Event:
     process: str
-    kind: str          # "local" | "send" | "receive"
+    kind: str         
     timestamp: int
     desc: str
     msg_id: str = ""
@@ -52,7 +51,6 @@ def run_scenario():
     P = {n: Process(n) for n in ("P1", "P2", "P3")}
     in_transit = {}  # msg_id -> (sender, ts)
 
-    # Skenario: urutan eksekusi event (global, real-time)
     steps = [
         ("P1", "local", "hitung data"),
         ("P1", "send", "m1", "P2"),
@@ -87,14 +85,12 @@ def verify(P, events):
     ok = True
     print("\n=== VERIFIKASI ===")
 
-    # 1. Clock tiap proses harus naik terus (monotonic)
     for name, proc in P.items():
         ts = [e.timestamp for e in proc.log]
         good = all(a < b for a, b in zip(ts, ts[1:]))
         ok &= good
         print(f"[{'OK' if good else 'GAGAL'}] {name}: timestamp naik ketat {ts}")
 
-    # 2. Untuk tiap pesan: ts(send) < ts(receive)
     sends = {e.msg_id: e for e in events if e.kind == "send"}
     recvs = {e.msg_id: e for e in events if e.kind == "receive"}
     for m, s in sends.items():
@@ -123,7 +119,6 @@ def main():
 
     verify(P, events)
 
-    # Total ordering: urutkan by (timestamp, process id) untuk memecah seri
     print("\n=== TOTAL ORDERING (timestamp, lalu id proses) ===")
     for i, e in enumerate(sorted(events, key=lambda x: (x.timestamp, x.process)), 1):
         print(f"{i:>2}. ({e.timestamp},{e.process}) {e.desc}")
